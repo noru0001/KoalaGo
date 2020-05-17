@@ -1,0 +1,163 @@
+﻿/* Move down content because we have a fixed navbar that is 50px tall */
+
+.divmenu {
+    background-color: lightblue;
+    height: 50px;
+}
+
+.div_move_up {
+    position: relative;
+    top: -20px;
+}
+
+.div_move_upmain {
+    position: relative;
+    top: -40px;
+}
+
+.div_move_top {
+    position: sticky;
+}
+
+.div_border {
+    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
+    transition: 0.3s;
+}
+
+.div_card1 {
+    border: 2px solid #e7e7e7;
+    border-radius: 4px;
+    padding: .5rem;
+    width: 40%;
+    text-align: center;
+    vertical-align: middle;
+    background-color: white;
+    color: #245504;
+}
+
+.div_card2 {
+    border: 2px solid #e7e7e7;
+    border-radius: 4px;
+    padding: .5rem;
+    width: 100%;
+    text-align: center;
+    vertical-align: middle;
+    background-color: white;
+    color: #245504;
+}
+
+.div_card3 {
+    border: 2px solid #e7e7e7;
+    border-radius: 4px;
+    padding: .5rem;
+    width: 20%;
+    height: 100px;
+    text-align: center;
+    vertical-align: middle;
+    background-color: white;
+    color: #245504;
+}
+
+.div_card4 {
+    border: 2px solid #e7e7e7;
+    border-radius: 4px;
+    vertical-align: middle;
+    background-color: white;
+    right: -15px;
+    color: #245504;
+    text-align: left;
+}
+
+.div_center_move_up {
+    position: relative;
+    top: -75px;
+    margin: auto;
+}
+
+.div_center_mapmove_up2 {
+    position: relative;
+    top: -40px;
+    margin: auto;
+    left: -5px;
+}
+
+.div_left_logo {
+    position: relative;
+    left: -14px;
+    bottom: -2px;
+    margin: auto;
+}
+
+.button1 {
+    background-color: #045504;
+    color: white;
+}
+
+.button2 {
+    background-color: #600505;
+    color: white;
+}
+
+.alignbottom {
+    position: static;
+    bottom: 0;
+}
+
+vertical-center {
+    min-height: 100%;
+    min-height: 300px;
+    display: flex;
+    align-items: center;
+}
+
+.mytextOnimg {
+    position: relative;
+    display: inline-block; /* Make the width of box same as image */
+}
+
+    .mytextOnimg .text {
+        position: absolute;
+        z-index: 999;
+        margin: 0 auto;
+        left: 0;
+        color: #ebebeb;
+        right: 0;
+        top: 40%; /* Adjust this value to move the positioned div up and down */
+        text-align: left;
+        width: 60%; /* Set the width of the positioned div */
+    }
+
+.div_green {
+    background-color: #485926;
+    min-height: 150px;
+}
+
+body {
+    padding-top: 50px;
+    padding-bottom: 20px;
+}
+
+/* Wrapping element */
+/* Set some basic padding to keep content from hitting the edges */
+.body-content {
+    padding-left: 15px;
+    padding-right: 15px;
+}
+
+/* Set widths on the form inputs since otherwise they're 100% wide */
+input,
+select,
+textarea {
+    max-width: 280px;
+}
+
+/* Responsive: Portrait tablets and up */
+@media screen and (min-width: 768px) {
+    .jumbotron {
+        margin-top: 20px;
+    }
+
+    .body-content {
+        padding: 0;
+    }
+}
