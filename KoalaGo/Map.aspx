@@ -4,6 +4,17 @@
 <head>
     <meta charset="utf-8" />
     <title>Driving directions</title>
+    <!-- Vendor JS Files -->
+    <script src="assets/vendor/jquery/jquery.min.js"></script>
+    <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="assets/vendor/jquery.easing/jquery.easing.min.js"></script>
+    <script src="assets/vendor/php-email-form/validate.js"></script>
+    <script src="assets/vendor/venobox/venobox.min.js"></script>
+    <script src="assets/vendor/waypoints/jquery.waypoints.min.js"></script>
+    <script src="assets/vendor/counterup/counterup.min.js"></script>
+    <script src="assets/vendor/owl.carousel/owl.carousel.min.js"></script>
+    <script src="assets/vendor/isotope-layout/isotope.pkgd.min.js"></script>
+    <script src="assets/vendor/aos/aos.js"></script>
 
     <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
     <link href="assets/vendor/animate.css/animate.min.css" rel="stylesheet">
@@ -47,13 +58,37 @@
     <script src="lib/leaflet-messagebox.js"></script>
     <link href="css/leaflet-messagebox.css" rel="stylesheet" />
     <script src="lib/leaflet.smoothmarkerbouncing.js"></script>
+
+    <script src="choroplethmap/suburbgeo_new.js"></script>
+    <link rel="stylesheet" type="text/css" href="choroplethmap/style.css" />
+    <script src="lib/suburbgeo_new.js"></script>
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+
     <style>
+        .myalign {
+            text-align: left;
+        }
+
+        .tooltip-inner {
+            width: 450px;
+            background-color: #FFE97A;
+            color: #244517;
+            font-size: small;
+            font-weight: bold;
+        }
+
         #map {
             height: 100%;
         }
     </style>
 
     <script>
+        //defining variables
+        var geojson;
+        var info;
         var clusters;
         var layerGroups;
         var circlelayer;
@@ -61,20 +96,43 @@
         var firelayer;
         var orglayer;
         var sakoala;
-        var vickoala;
-        var nswkoala;
-        var qldkoala;
-        var QAfires;
-        var NSWfires;
         var searchlayer;
         var popup;
         var directionsLayer;
+        var chroplthlayer;
+        var pastFires;
+        var legend;
+
         var directionsInputControl;
         var mylat = [];
         var mylon = [];
         var mydis = [];
 
         $(document).ready(function () {
+            //Set maximum value for past fire date field
+            setMaxFIreDate();
+            function setMaxFIreDate() {
+                var today = new Date();
+                var dd = today.getDate();
+                var mm = today.getMonth() + 1; //January is 0!
+                var yyyy = today.getFullYear();
+                if (dd < 10) {
+                    dd = '0' + dd
+                }
+                if (mm < 10) {
+                    mm = '0' + mm
+                }
+
+                today = yyyy + '-' + mm + '-' + dd;
+                document.getElementById("txtdate").setAttribute("max", today);
+            }
+
+            //set all the tool tips
+            $('[data-toggle="tooltip"]').tooltip();
+
+            $("#div_chrolo").hide();
+            //remove search when loading map
+            removeSearch();
             $("#distanceval").hide();
             $("#inputs").hide();
             $("#myPopup").hide();
@@ -87,11 +145,23 @@
 
                 map.closePopup();
             });
+            //loading past fires
+            $("#firebtn").click(function () {
 
+                if (pastFires != null) {
+                    map.removeLayer(pastFires);
+                }
+                if ($("#txtdate").val() == '') {
+                    alert("Please select past fire date!");
+                } else {
+
+                    displayPastFireInformation();
+
+                }
+
+            });
+            //showing Navigation control and hiding other laters
             $("#GeoFunction1").click(function () {
-                //if (directionsLayer != null) {
-                //    map.removeLayer(directionsLayer);
-                //}
 
                 $("#distanceval").hide();
                 $("#inputs").show();
@@ -99,9 +169,9 @@
                 map.closePopup();
                 circlelayer = L.layerGroup()
                 map.addLayer(circlelayer);
-                  
-            });
 
+            });
+            //showing search function on the map
             $("#GeoFunction2").click(function () {
 
                 if (directionsLayer != null) {
@@ -118,66 +188,22 @@
                 map.closePopup();
 
             });
+            //clear all in the map
             $("#GeoFunction3").click(function () {
-              
+
                 location.reload();
-               
 
             });
 
             $('#mySelect').change(function () {
                 var value = $(this).val();
             });
-
-            //$("#rSA").click(function () {
-
-            //    if (layerGroups != null) {
-            //        map.removeLayer(layerGroups);
-
-            //    }
-
-            //    if (clusters != null)
-
-            //        map.removeLayer(clusters);
-
-            //    FilteredMapByState();
-            //});
-
-            $("#rQLD").click(function () {
-
-                if (layerGroups != null) {
-                    map.removeLayer(layerGroups);
-                }
-                if (clusters != null)
-
-                    map.removeLayer(clusters);
-
-                FilteredMapByState();
-            });
-
-            $("#rNSW").click(function () {
-
-                if (layerGroups != null)
-                    map.removeLayer(layerGroups);
-
-                if (clusters != null)
-
-                    map.removeLayer(clusters);
-
-                FilteredMapByState();
-            });
-            //$("#rVIC").click(function () {
-
-            //    if (layerGroups != null)
-            //        map.removeLayer(layerGroups);
-
-            //    if (clusters != null)
-
-            //        map.removeLayer(clusters);
-
-            //    FilteredMapByState();
-            //});
+            //show individual koala sighting
             $("#rALLState").click(function () {
+                if (geojson != null)
+                    map.removeLayer(geojson);
+                removeInfo();
+                removelegend();
 
                 if (layerGroups != null)
                     map.removeLayer(layerGroups);
@@ -187,9 +213,15 @@
                     map.removeLayer(clusters);
 
                 FilteredMapByState();
+                $("#div_chrolo").show();
             });
+            //show clustered sigting
 
             $("#allData").click(function () {
+                if (geojson != null)
+                    map.removeLayer(geojson);
+                removeInfo();
+                removelegend();
 
                 if (layerGroups != null)
                     map.removeLayer(layerGroups);
@@ -199,39 +231,31 @@
                     map.removeLayer(clusters);
 
                 displayMapWithLocationCount();
+                $("#div_chrolo").hide();
 
             });
+            //Locading Choropleth map
+            $("#cmbchoro").click(function () {
+                if (geojson != null)
+                    map.removeLayer(geojson);
+                removeInfo();
+                removelegend();
 
+                if (layerGroups != null)
+                    map.removeLayer(layerGroups);
+
+                if (clusters != null)
+
+                    map.removeLayer(clusters);
+
+                loadsecondMap();
+
+            });
+            //load QA and NSW fires
             setQAfires();
             setNSWfires();
 
-            $("#rNSW1").click(function () {
-                if (NSWfires != null) { map.removeLayer(NSWfires); }
-                if (QAfires != null) { map.removeLayer(QAfires); }
-
-                setNSWfires();
-            });
-
-            $("#rQLD1").click(function () {
-                if (NSWfires != null) { map.removeLayer(NSWfires); }
-                if (QAfires != null) { map.removeLayer(QAfires); }
-
-                setQAfires();
-            });
-
-            $("#rALLState1").click(function () {
-                if (NSWfires != null) { map.removeLayer(NSWfires); }
-                if (QAfires != null) { map.removeLayer(QAfires); }
-
-                setQAfires();
-                setNSWfires();
-            });
-            $("#rclearBushfires").click(function () {
-                if (NSWfires != null) { map.removeLayer(NSWfires); }
-                if (QAfires != null) { map.removeLayer(QAfires); }
-
-            });
-
+            //get current yeat and month
             function getCurrentYearMonth() {
 
                 var today = new Date();
@@ -249,7 +273,7 @@
                 return res;
 
             }
-
+            //check the koala loacation is a recently seen location
             function checkIsRecentlySeenLocation(dateseen) {
                 var currmonth = getCurrentYearMonth();
                 var ds = getYearMonthGivenDate(dateseen);
@@ -262,6 +286,7 @@
                 }
 
             }
+            //local insividual koala sighting
             function FilteredMapByState() {
                 if (clusters != null)
 
@@ -272,7 +297,7 @@
 
                 $.ajax({
                     type: "POST",
-                    url: "MapsInformation.aspx/getKoalaInfo",
+                    url: "Map.aspx/getKoalaInfo",
                     contentType: "application/json; charset=utf-8",
                     dataType: "json",
                     success: function (response) {
@@ -286,13 +311,13 @@
                             iconUrl: 'Images/recentlySeen.png'
 
                         });
-
+                        //defining image for last seen koalas
                         var koalaLoc1 = L.icon({
                             iconSize: [40, 40],
                             iconUrl: 'Images/koalaLoc.png'
 
                         });
-
+                        //creating a new layer
                         layerGroups = L.layerGroup()
                         var v = 0;
                         var isAll = 0;
@@ -307,87 +332,20 @@
                             // Adding marker to the map
                             var lat = parseFloat(obj['lat']);
                             var lon = parseFloat(obj['lon']);
-                            v = 0;
 
-                            //if (obj['state'] == 'VIC' && (($("#rVIC").is(":checked"))) || isAll == 1) {
-                            //    // checked
+                            if (checkIsRecentlySeenLocation(obj['datefound']) == 1) {
 
-                            //    if (checkIsRecentlySeenLocation(obj['datefound']) == 1) {
+                                marker = new L.marker([lat, lon], { icon: iconRecentlySeen });
 
-                            //        marker = new L.marker([lat, lon], { icon: iconRecentlySeen });
+                            } else {
 
-                            //    }
-                            //    else {
-
-                            //        marker = new L.marker([lat, lon], { icon: koalaLoc1 });
-
-                            //    }
-                            //    marker.bindPopup('<div>' + '<b>Last seen on:</b>' + ' ' + obj['datefound'] + ' <br />  <b>' + "State:</b>" + obj['state'] + '</div>');
-
-                            //    v = 1;
-
-                            //}
-                            //else
-                            if (obj['state'] == 'NSW' && (($("#rNSW").is(":checked"))) || isAll == 1) {
-
-                                if (checkIsRecentlySeenLocation(obj['datefound']) == 1) {
-
-                                    marker = new L.marker([lat, lon], { icon: iconRecentlySeen });
-
-                                }
-                                else {
-                                    marker = new L.marker([lat, lon], { icon: koalaLoc1 });
-
-                                }
-
-                                marker.bindPopup('<div>' + '<b>Last seen on:</b>' + ' ' + obj['datefound'] + ' <br />  <b>' + "State:</b>" + obj['state'] + '</div>');
-
-                                v = 2;
-                                //alert('nsw' + marker);
-                            }
-
-                            else if (obj['state'] == 'QLD' && (($("#rQLD").is(":checked"))) || isAll == 1) {
-
-                                if (checkIsRecentlySeenLocation(obj['datefound']) == 1) {
-
-                                    marker = new L.marker([lat, lon], { icon: iconRecentlySeen });
-
-                                }
-                                else {
-                                    marker = new L.marker([lat, lon], { icon: koalaLoc1 });
-
-                                }
-                                marker.bindPopup('<div>' + '<b>Last seen on:</b>' + ' ' + obj['datefound'] + ' <br />  <b>' + "State:</b>" + obj['state'] + '</div>');
-
-                                v = 3;
-                                // alert('a33');
+                                marker = new L.marker([lat, lon], { icon: koalaLoc1 });
 
                             }
-                            //else if (obj['state'] == 'SA' && (($("#rSA").is(":checked"))) || isAll == 1) {
-                            //    v = 4;
-                            //    if (checkIsRecentlySeenLocation(obj['datefound']) == 1) {
+                            //add descriptions to the marker
+                            marker.bindPopup('<div>' + '<b>Last seen on:</b>' + ' ' + obj['datefound'] + ' <br />  <b>' + "State:</b>" + obj['state'] + '</div>');
 
-                            //        marker = new L.marker([lat, lon], { icon: iconRecentlySeen });
-
-                            //    }
-                            //    else {
-                            //        marker = new L.marker([lat, lon], { icon: koalaLoc1 });
-
-                            //    }
-                            //    marker.bindPopup('<div>' + '<b>Last seen on:</b>' + ' ' + obj['datefound'] + ' <br />  <b>' + "State:</b>" + obj['state'] + '</div>');
-
-                            //}
-
-                            //else {
-                            //    marker = new L.marker([lat, lon]);
-                            //    marker.bindPopup('<div>' + 'Last seen on:' + ' ' + obj['datefound'] + '<br /> ' + "State:" + obj['state'] + ' ' + 'lat' + obj['lat'] + ' lon' + obj['lon']+'</div>');
-
-                            //    layerGroups.addTo(marker);
-
-                            //}
-
-                            if (v >= 2 && v <= 3)
-                                layerGroups.addLayer(marker);
+                            layerGroups.addLayer(marker);
 
                         }
 
@@ -413,7 +371,6 @@
     </style>
 </head>
 <body>
-
     <!-- ======= Header ======= -->
     <header id="header" class="fixed-top ">
         <div class="container">
@@ -426,14 +383,10 @@
 
             <nav class="nav-menu float-right d-none d-lg-block">
                 <ul>
-                    <li class="active"><a href="index.aspx">Home</a></li>
+                    <li><a href="index.aspx">Home</a></li>
                     <li><a href="Volunteering.aspx">Volunteering</a></li>
-                    <li class="drop-down"><a>Map</a>
-                        <ul>
-                            <li><a href="Map.aspx">Location Map</a></li>
-                            <li><a href="ChoroplethMap.aspx">Choropleth Map</a></li>
-                        </ul>
-                    </li>
+                    <li><a href="Map.aspx">Koala Eye</a></li>
+
                     <li><a href="Information.aspx">Information</a></li>
                 </ul>
             </nav>
@@ -441,35 +394,39 @@
         </div>
     </header>
     <!-- End Header -->
-
-    <main id="main" style="height: 100%; width: 100%;">
-
-        <form runat="server">
+    <form>
+        <main id="main" style="height: 100%; width: 100%;">
 
             <div class="row div_center_mapmove_up2" style="height: 100%;">
                 <div class="col-md-1"></div>
 
                 <div class="col-md-2 order-1 div_card4 " style="height: 100%;">
 
-                    <h5><b>Koala Distribution </b></h5>
+                    <h5><b>Koala Sighting </b></h5>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="radio" id="allData" checked="checked" name="koala" value="Queensland">&nbsp;Hotspot Clusters
 
-                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="radio" id="rNSW" name="koala" value="New south wales">New south wales<br />
-                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="radio" id="rQLD" name="koala" value="Queensland">Queensland<br />
-                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="radio" id="rALLState" name="koala" value="Queensland">Both States<br />
-                    <input type="radio" id="allData" checked="checked" name="koala" value="Queensland">Click here to show count<br />
-                    <hr />
-                    <h5><b>Bushfire Distribution</b></h5>
+                 <img class="test" src="Images/help.png" data-toggle="tooltip" data-placement="right" data-offset="20 0" data-html="true" title="<p class='myalign'> You will find the the highest number of Koala population in the areas.</p>" />
 
-                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="radio" id="rNSW1" name="bush1" value="New south wales">New south wales<br />
-                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="radio" id="rQLD1" name="bush1" value="Queensland">Queensland<br />
-                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="radio" checked="checked" id="rALLState1" name="bush1" value="Queensland">Both States<br />
-                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="radio" id="rclearBushfires" name="bush1" value="Queensland">Clear Bushfires<br />
+                    <br />
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="radio" id="rALLState" name="koala" value="Queensland">&nbsp;Individual Sighting
+                   <img class="test" src="Images/help.png" data-toggle="tooltip" data-placement="right" data-offset="20 0" data-html="true" title="<p class='myalign'>You will see the every single Koala distribution in NSW & QLD, Koala sightings including the past sightings and recent sightings.<br /><img width='25' height='25'  src='Images/koalaLoc.png' /> -koala location marker <br /><img width='25' height='25'  src='Images/recentlySeen.png' / >-Recent Koala Location marker </p>" />
+
+                    <br />
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="radio" id="cmbchoro" name="koala" value="Area Likelihood">&nbsp;Area Likelihood
+                    <img class="test" src="Images/help.png" data-toggle="tooltip" data-placement="right" data-offset="20 0" data-html="true" title="<p class='myalign'>You will find the most probable areas with high likelihood of Koalas presence.<br /> </p>" />
+                    <br />
                     <hr />
 
                     <h5><b>Geo Functions</b></h5>
-                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="radio" id="GeoFunction1" name="function" value="Navigate">Navigate<br />
-                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="radio" id="GeoFunction2" name="function" value="Highlight Area">Highlight Area<br />
-                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input checked="checked" type="radio" id="GeoFunction3" name="function" value="Clear">Clear Functions
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="radio" id="GeoFunction1" name="function" value="Navigate">&nbsp;Navigate
+                <img class="test" src="Images/help.png" data-toggle="tooltip" data-placement="right" data-offset="20 0" data-html="true" title="<p class='myalign'> You can use navigate tool to choose different two points on map and checkout the distance and time spent between those selected points.</p>" />
+                    <br />
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="radio" id="GeoFunction2" name="function" value="Highlight Area">&nbsp;Highlight Area
+                     <img class="test" src="Images/help.png" data-toggle="tooltip" data-placement="right" data-offset="20 0" data-html="true" title="<p class='myalign'> Once you enter your location and choose the range, you will see all of the volunteering organisations and koala sightings in that range around you.</p>" />
+
+                    <br />
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input checked="checked" type="radio" id="GeoFunction3" name="function" value="Clear">&nbsp;Clear Functions
+                     <img class="test" src="Images/help.png" data-toggle="tooltip" data-placement="right" data-offset="20 0" data-html="true" title="<p class='myalign'>Clear all the controls in the page</p>" />
 
                     <div id="distanceval">
                         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input checked="checked" type="radio" id="d5" name="distance" value="5000">5 km<br />
@@ -482,9 +439,16 @@
                     </div>
 
                     <hr />
+                    <h5><b>Past Fires</b></h5>
+                    <input type="date" min='2020-01-01' id="txtdate" />
+                    <button type="button" id="firebtn" class="btn btn-secondary">show</button>
+                    <img class="test" src="Images/help.png" data-toggle="tooltip" data-placement="right" data-offset="20 0" data-html="true" title="<p class='myalign'>Display fire information for past date</p>" />
+
+                    <br />
                     <h5><b>Legends</b></h5>
                     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src="Images/fireIcon.png" width="25" height="25" />-Bushfire<br />
-                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src="Images/koalaHome.png" width="25" height="25" />-Koala Organisation<br />
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src="Images/pastfire.png" width="25" height="25" />-Past Bushfire<br />
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src="Images/koalaHome.png" width="25" height="25" />-Volunteering Organisation<br />
                     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src="Images/koalaLoc.png" width="25" height="25" />-Koala Location<br />
                     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src="Images/recentlySeen.png" width="25" height="25" />-Recent Koala Location
                 </div>
@@ -494,12 +458,12 @@
                     <div id="map"></div>
                     <div id='inputs'></div>
                     <div id='directions'>
-                        <div class="popuptext" id="myPopup">A Simple Popup!</div>
+                        <div class="popuptext" id="myPopup"></div>
                     </div>
                 </div>
             </div>
-        </form>
-    </main>
+        </main>
+    </form>
 
     <!-- ======= Footer ======= -->
     <footer id="footer" data-aos="fade-up" data-aos-easing="ease-in-out" data-aos-duration="500">
@@ -522,7 +486,7 @@
                         <ul>
                             <li><i class="bx bx-chevron-right"></i><a href="Information.aspx#koalainfo">Know About Koala</a></li>
                             <li><i class="bx bx-chevron-right"></i><a href="Information.aspx#bushfireinfo">Know About Bushfire</a></li>
-                            <li><i class="bx bx-chevron-right"></i><a href="Information.aspx#datadetail">Kow About Bushfire Affects on Koalas</a></li>
+                            <li><i class="bx bx-chevron-right"></i><a href="Information.aspx#datadetail">Know About Bushfire Effects On Koalas</a></li>
                         </ul>
                     </div>
 
@@ -530,7 +494,7 @@
                         <h4>Koala Eye</h4>
                         <ul>
                             <li><i class="bx bx-chevron-right"></i><a href="Map.aspx">View Koala Locations</a></li>
-                            <li><i class="bx bx-chevron-right"></i><a href="ChoroplethMap.aspx">View Choropleth Map</a></li>
+                            <li><i class="bx bx-chevron-right"></i><a href="Map.aspx">Likelihood Map</a></li>
                         </ul>
                     </div>
                 </div>
@@ -538,6 +502,7 @@
         </div>
     </footer>
     <!-- End Footer -->
+
     <a href="#" class="back-to-top"><i class="icofont-simple-up"></i></a>
 
     <!-- Vendor JS Files -->
@@ -594,15 +559,30 @@
     <link rel='stylesheet' href='https://api.mapbox.com/mapbox.js/plugins/mapbox-directions.js/v0.4.0/mapbox.directions.css' type='text/css' />
 
     <script>
+        var currlat;
+        var currlon;
+        navigator.geolocation.getCurrentPosition(function (location) {
+            currlat = location.coords.latitude;
+            currlon = location.coords.longitude;
+        });
+        if (currlat == null) {
+            currlat = -29.833710;
+        } if (currlon == null) {
+            currlon = 148.32101;
+        }
+        //token for the map
         L.mapbox.accessToken = 'pk.eyJ1Ijoibm9ydTAwMDEiLCJhIjoiY2s5eXZwcms0MDgxdTNkczRiY2c0bmozdiJ9.x23fG3xIC_3n6J46ZXCLiA';
         var map = L.mapbox.map('map', null, {
             zoomControl: false
         })
-            .setView([-29.833710, 148.321011], 5)
+            .setView([currlat, currlon], 5)
             .addLayer(L.mapbox.styleLayer('mapbox://styles/mapbox/streets-v11'));
         L.control.zoom({
             position: 'topright'
         }).addTo(map);
+
+        L.control.scale({ position: 'bottomright' }).addTo(map);
+
         // move the attribution control out of the way
         map.attributionControl.setPosition('bottomleft');
 
@@ -644,7 +624,7 @@
             var disval = (distance / 1000).toFixed(2);;
             var dur_hours = Math.floor(duration / 3600);
             var dur_minutes = Math.floor((duration % 3600) / 60);
-
+            //create a pop up for distance feature
             popup = L.popup()
                 .setLatLng([origin[1], origin[0]])
                 .setContent("<div><b>Distance:</b>" + disval + "km<br /><b>Duration:</b>" + dur_hours + "hours &nbsp;" + dur_minutes + 'minutes<br /><a href=https://www.google.com/maps/dir/' + fromlat + ',' + fromlon + '/' + tolat + ',' + tolon + '>Click here to enter the Google Map</a></div>')
@@ -674,22 +654,17 @@
             map.removeControl(searchControl);
         }
 
-        //var searchControl = L.esri.Geocoding.geosearch();
-        // searchlayer.addLayer(searchControl);
-        //map.addLayer(searchControl);
         //Setting fires in QA
+
         function setQAfires() {
             $.ajax({
                 type: "POST",
-                url: "MapsInformation.aspx/getFiresQA",
+                url: "Map.aspx/getFiresQA",
                 contentType: "application/json; charset=utf-8",
                 dataType: "json",
                 success: function (response) {
-
                     var json = JSON.parse(response.d);
-                    //  alert(json);
 
-                    // alert('xxx');
                     QAfires = L.layerGroup();
                     var fireIcon = L.icon({
                         iconSize: [30, 30],
@@ -708,7 +683,7 @@
                         QAfires.addLayer(marker);
 
                     }
-
+                    //adding fire layer to the map
                     QAfires.addTo(map);
 
                 },
@@ -749,7 +724,7 @@
                         NSWfires.addLayer(marker);
 
                     }
-
+                    //adding fire layer to the map
                     map.addLayer(NSWfires);
 
                 },
@@ -791,26 +766,20 @@
                         // Adding marker to the map
                         var lat = parseFloat(obj['lat']);
                         var lon = parseFloat(obj['lon']);
-                        //  var date = String(obj['date']);
-                        //marker = new L.marker([lat, lon], { icon: shelterIcon });
 
-                        // marker = new L.marker([lat, lon], { icon: shelterIcon });
-                        //alert('rrr');
-                        // alert(count);
                         if (count == 0) {
-                            //   alert('0000');
+                            //creating a marker
                             marker = new L.marker([lat, lon], { icon: shelterIcon });
-                            // alert('aaaaa');
+
                         }
                         else {
 
-                            //alert('bbbb');
                             for (var i = 0; i < mylat.length; i++) {
                                 var lat1 = mylat[i];
                                 var lon1 = mylon[i];
                                 var dis = calDistance(lat1, lon1, lat, lon);
                                 if (dis <= mydis[i] / 1000) {
-
+                                    //creating a marker with bouncing
                                     marker = new L.marker([lat, lon], { icon: shelterIcon2 }).setBouncingOptions({
                                         bounceHeight: 60,   // height of the bouncing
                                         bounceSpeed: 54,   // bouncing speed coefficient
@@ -851,7 +820,7 @@
             });
 
         }
-
+        //calculate the distance between given two markers
         function calDistance(lat1, lon1, lat2, lon2) {
             var R = 6371; // km
             var dLat = toRad(lat2 - lat1);
@@ -882,9 +851,9 @@
             iconSize: [40, 40]
 
         });
-
+        //adding a circle after seaching address and highlighting that area
         searchControl.on('results', function (data) {
-            //alert('count='+count);
+            //creating layer group if requred
             if (circlelayer != null) {
                 // map.removeLayer(circlelayer);
             }
@@ -907,7 +876,7 @@
                 var co4 = co1[0].split('(');
 
                 var circleCenter = [co4[1], co3[0]];//setting lat lon values
-
+                //definin different colors for different circled to be added
                 var circleOptions1 = {
                     color: '#3388FF',
                     fillColor: '#92C4E5',
@@ -986,15 +955,6 @@
 
                 count++;
 
-                //var draw = new MapboxDraw({
-                //    displayControlsDefault: false,
-                //    controls: {
-                //        polygon: true,
-                //        trash: true
-                //    }
-                //});
-
-                count++;
                 break;
             }
         });
@@ -1003,6 +963,7 @@
 
         displayMapWithLocationCount();
 
+        //Display clustered koala information
         function displayMapWithLocationCount() {
 
             $.ajax({
@@ -1022,6 +983,12 @@
                         iconUrl: 'Images/koalaLoc.png'
 
                     });
+
+                    var iconRecentlySeen = L.icon({
+                        iconSize: [30, 30],
+                        iconUrl: 'Images/recentlySeen.png'
+
+                    });
                     for (var i = 0; i < json.length; i++) {
                         var obj = json[i];
 
@@ -1034,9 +1001,17 @@
                         fe = "<div><b>State: </b>" + obj['state'] + '<br /> <b>Date_found: </b>' + obj['datefound'] + '</div>';
                         //alert('count' + count);
 
-                        var marker = new L.marker([lat, lon], { icon: koalaLoc1 });
+                        var marker;
 
-                        // var marker = L.marker(new L.LatLng(lat, lon), { title: title }, { icon: koalaLoc1 });
+                        if (checkIsRecentlySeenLocation(obj['datefound']) == 1) {
+
+                            marker = new L.marker([lat, lon], { icon: iconRecentlySeen });
+
+                        }
+                        else {
+                            marker = new L.marker([lat, lon], { icon: koalaLoc1 });
+                        }
+
                         marker.bindPopup(fe);
                         clusters.addLayer(marker);
 
@@ -1051,6 +1026,199 @@
             });
 
         }
+
+        function displayPastFireInformation() {
+
+            var obj = {};
+            obj.date1 = $.trim($("[id*=txtdate]").val());
+
+            $.ajax({
+                type: "POST",
+                url: "Map.aspx/displayPastFireInformation",
+                data: JSON.stringify(obj),
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (response) {
+
+                    var json = JSON.parse(response.d);
+
+                    var someFeatures = new String("");
+                    var count = 0;
+                    pastFires = L.layerGroup();
+                    var fire2 = L.icon({
+                        iconSize: [25, 25],
+                        iconUrl: 'Images/pastfire.png'
+
+                    });
+
+                    for (var i = 0; i < json.length; i++) {
+                        var obj = json[i];
+
+                        // Adding marker to the map
+                        var lat = parseFloat(obj['lat']);
+                        var lon = parseFloat(obj['lon']);
+
+                        // marker.addTo(map);
+                        var fe;
+                        fe = "<div><b>Alert Type: </b>" + obj['alerttype'] + '<br /> <b>Status: </b>' + obj['status'] + '<br /> <b>Details: </b>' + obj['details'] + '</div>';
+
+                        var marker;
+                        marker = new L.marker([lat, lon], { icon: fire2 });
+                        marker.bindPopup(fe);
+                        pastFires.addLayer(marker);
+
+                    }
+
+                    map.addLayer(pastFires);
+
+                },
+                failure: function (response) {
+                    alert(response.d);
+                }
+            });
+
+        }
+
+        function getCurrentYearMonth() {
+
+            var today = new Date();
+            var month = (today.getMonth() + 1);
+            if (month < 10) month = '0' + month;
+
+            var yearMonth = today.getFullYear() + '' + month;
+            return yearMonth;
+
+        }
+
+        function getYearMonthGivenDate(val) {
+
+            var res = val.substring(0, 4) + val.substring(5, 7);
+            return res;
+
+        }
+
+        function checkIsRecentlySeenLocation(dateseen) {
+            var currmonth = getCurrentYearMonth();
+            var ds = getYearMonthGivenDate(dateseen);
+            var newval = currmonth - 1;
+            if (newval <= ds) {
+                return 1;
+            }
+            else {
+                return 0;
+            }
+
+        }
+
+        function getColor(d) {
+            return d >= 300 ? '#800026' :
+                d >= 200 ? '#bd0026' :
+                    d >= 100 ? '#E31A1C' :
+                        d >= 50 ? '#FC4E2A' :
+                            d >= 30 ? '#FD8D3C' :
+                                d >= 10 ? '#FEB24C' :
+                                    d >= 1 ? '#FED976' :
+                                        'rgba(255,237,160,0)';
+        }
+        function style(feature) {
+            return {
+                fillColor: getColor(feature.properties.count),
+                weight: 2,
+                opacity: 1,
+                color: 'white',
+                dashArray: '3',
+                fillOpacity: 0.7
+            };
+        }
+
+        function highlightFeature(e) {
+            var layer = e.target;
+            layer.setStyle({
+                weight: 5,
+                color: '#666',
+                dashArray: '',
+                fillOpacity: 0.7
+            });
+            if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
+                layer.bringToFront();
+            }
+            info.update(layer.feature.properties);
+        }
+        function resetHighlight(e) {
+            geojson.resetStyle(e.target);
+            info.update();
+        }
+        function zoomToFeature(e) {
+            map.fitBounds(e.target.getBounds());
+        }
+        function onEachFeature(feature, layer) {
+            layer.on({
+                mouseover: highlightFeature,
+                mouseout: resetHighlight,
+                //click: zoomToFeature
+            });
+        }
+        var info = L.control();
+        function loadsecondMap() {
+
+            geojson = L.geoJson(suburbGeo, {
+                style: style,
+                onEachFeature: onEachFeature
+            }).addTo(map);
+
+            info.onAdd = function (map) {
+                this._div = L.DomUtil.create('div', 'info'); // create a div with a class "info"
+                this.update();
+                return this._div;
+            };
+            // method that we will use to update the control based on feature properties passed
+            info.update = function (props) {
+                this._div.innerHTML = '<h4>Koala population</h4>' + (props ?
+                    '<b>' + props.suburb + '</b><br />' + props.count + ' koala records</b><br />Most probable month: ' + props.month + '<sup></sup>'
+                    : 'Hover over Hotspots');
+            };
+
+            info.addTo(map);
+            legend = L.control({ position: 'bottomright' });
+            legend.onAdd = function (map) {
+                var div = L.DomUtil.create('div', 'info legend'),
+                    grades = [0, 1, 10, 30, 50, 100, 200, 300],
+                    labels = [];
+                // loop through our density intervals and generate a label with a colored square for each interval
+                for (var i = 0; i < grades.length; i++) {
+                    div.innerHTML +=
+                        '<i style="background:' + getColor(grades[i] + 1) + '"></i> ' +
+                        grades[i] + (grades[i + 1] ? '&ndash;' + grades[i + 1] + '<br>' : '+');
+                }
+                return div;
+            };
+            legend.addTo(map);
+            addInfo();
+            addlegend();
+        }
+
+        function addlegend() {
+
+            map.addControl(legend);
+        } function removelegend() {
+            if (legend != null)
+                map.removeControl(legend);
+        }
+
+        function addInfo() {
+
+            map.addControl(info);
+        } function removeInfo() {
+            if (info != null)
+                map.removeControl(info);
+        }
+        //focussing the user's current location when logged in
+        navigator.geolocation.getCurrentPosition(function (location) {
+            currlat = location.coords.latitude;
+            currlon = location.coords.longitude;
+            if (currlat != null && currlon != null)
+                map.setView([currlat, currlon], 12);
+        });
     </script>
 </body>
 </html>

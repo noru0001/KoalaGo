@@ -17,12 +17,10 @@ namespace KoalaGo
         {
             if (!IsPostBack)
             {
-                //  setFires();
-                //   getFires();
-                // getFiresNSW();
             }
         }
 
+        //get koala information from data base and pass it to front end
         [WebMethod]
         public static string getKoalaOrganisations()
         {
@@ -34,12 +32,18 @@ namespace KoalaGo
             return result;
         }
 
-        public void setFires()
+        [WebMethod]
+        public static string displayPastFireInformation(String date1)
         {
-            string text = System.IO.File.ReadAllText(Server.MapPath("FireData/recent-hotspots.json"));
+            DataManager dm = new DataManager();
+            DataTable dt = dm.getHistoricFires(date1);
 
-            val = JsonConvert.SerializeObject(text);
+            string result = JsonConvert.SerializeObject(dt);
+
+            return result;
         }
+
+        //get koala information from database and pass it to front end
 
         [WebMethod]
         public static string getKoalaInfo()
@@ -52,6 +56,7 @@ namespace KoalaGo
             return result;
         }
 
+        //get fire information from QA Fire RSS feed and capture relevent information and pass it to front end
         [WebMethod]
         public static string getFiresQA()
         {
@@ -98,14 +103,12 @@ namespace KoalaGo
                 String details = lines[3].Split(':')[1];
 
                 table.Rows.Add(lat, lon, s.ToString("dddd, dd MMMM yyyy HH:mm:ss"), alerttype, reported, status, details, "QLD");
-
-                //// String title = nexts[4].InnerText;
-                //    arr.Add(JsonConvert.SerializeObject("lat:" + lat + ",lon:" + lon + ",time:" + time1));
             }
             result = JsonConvert.SerializeObject(table);
             return result;
         }
 
+        //get fire information from NSW Fire RSS feed and capture relevent information and pass it to front end
         [WebMethod]
         public static string getFiresNSW()
         {
@@ -156,8 +159,6 @@ namespace KoalaGo
                     table.Rows.Add(lat, lon, s.ToString("dddd, dd MMMM yyyy HH:mm:ss"), alerttype, location, council, status, responsibleAgency, "NSW");
                 }
                 catch (Exception ex) { }
-                //// String title = nexts[4].InnerText;
-                //    arr.Add(JsonConvert.SerializeObject("lat:" + lat + ",lon:" + lon + ",time:" + time1));
             }
             result = JsonConvert.SerializeObject(table);
             return result;

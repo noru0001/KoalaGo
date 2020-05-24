@@ -172,7 +172,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="a.sql" />
     <Content Include="App_Data\KoalaDB.mdf" />
     <Content Include="App_Data\KoalaDB_log.ldf">
       <DependentUpon>KoalaDB.mdf</DependentUpon>
@@ -264,6 +263,7 @@
     <Content Include="Content\Site.css" />
     <Content Include="css\leaflet-messagebox.css" />
     <Content Include="css\TripgoRouting.css" />
+    <Content Include="Default.aspx" />
     <Content Include="dist\TripgoRouting-src.js" />
     <Content Include="dist\TripgoRouting.js" />
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
@@ -276,19 +276,24 @@
     <Content Include="Content\bootstrap.css.map" />
     <Content Include="Content\bootstrap-theme.min.css.map" />
     <Content Include="Content\bootstrap-theme.css.map" />
+    <Content Include="Images\cluster.png" />
     <Content Include="Images\favicon.ico" />
     <Content Include="Images\fireIcon.png" />
+    <Content Include="Images\help.png" />
     <Content Include="Images\home.png" />
     <Content Include="Images\koalaHome.png" />
+    <Content Include="Images\koalaLoc.png" />
     <Content Include="Images\m1.png" />
     <Content Include="Images\m2.png" />
     <Content Include="Images\m3.png" />
-    <Content Include="Images\m4.png" />
+    <Content Include="Images\pastfire.png" />
+    <Content Include="Images\recentlySeen.png" />
     <Content Include="Images\tripgoRouting.jpg" />
     <Content Include="Images\tripgoRouting2.jpg" />
     <Content Include="Images\tripgoRoutingFloatPanel.jpg" />
     <Content Include="index.aspx" />
     <Content Include="Information.aspx" />
+    <Content Include="lib\density.js" />
     <Content Include="lib\jquery-3.2.1.js" />
     <Content Include="lib\leaflet-messagebox.js" />
     <Content Include="lib\leaflet.smoothmarkerbouncing.js" />
@@ -324,9 +329,9 @@
     <Content Include="assets\vendor\icofont\fonts\icofont.woff" />
     <Content Include="assets\vendor\icofont\fonts\icofont.woff2" />
     <Content Include="assets\vendor\jquery\jquery.min.map" />
+    <Content Include="lib\suburbgeo_new.js" />
     <Content Include="Scripts\leaflet-mapbox-gl.js" />
     <Content Include="Map.aspx" />
-    <Content Include="ZZ.aspx" />
     <None Include="Properties\PublishProfiles\CustomProfile.pubxml" />
     <None Include="Properties\PublishProfiles\DeployKoalaGo.pubxml" />
     <None Include="Properties\PublishProfiles\FolderProfile.pubxml" />
@@ -460,6 +465,13 @@
     <Compile Include="Data\ExternalData.cs" />
     <Compile Include="Data\Feature_Point.cs" />
     <Compile Include="Data\LogManager.cs" />
+    <Compile Include="Default.aspx.cs">
+      <DependentUpon>Default.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Default.aspx.designer.cs">
+      <DependentUpon>Default.aspx</DependentUpon>
+    </Compile>
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
@@ -519,13 +531,6 @@
     </Compile>
     <Compile Include="Map.aspx.designer.cs">
       <DependentUpon>Map.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="ZZ.aspx.cs">
-      <DependentUpon>ZZ.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="ZZ.aspx.designer.cs">
-      <DependentUpon>ZZ.aspx</DependentUpon>
     </Compile>
   </ItemGroup>
   <ItemGroup />

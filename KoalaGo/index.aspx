@@ -59,14 +59,10 @@
 
             <nav class="nav-menu float-right d-none d-lg-block">
                 <ul>
-                    <li class="active"><a href="index.aspx">Home</a></li>
+                    <li><a href="index.aspx">Home</a></li>
                     <li><a href="Volunteering.aspx">Volunteering</a></li>
-                    <li class="drop-down"><a>Koala Eye</a>
-                        <ul>
-                            <li><a href="Map.aspx">Location Map</a></li>
-                            <li><a href="ChoroplethMap.aspx">Choropleth Map</a></li>
-                        </ul>
-                    </li>
+                    <li><a href="Map.aspx">Koala Eye</a></li>
+
                     <li><a href="Information.aspx">Information</a></li>
                 </ul>
             </nav>
@@ -114,7 +110,7 @@
                 <div class="carousel-container">
                     <h2 class="animated fadeInDown">Koala Eye</h2>
                     <p class="animated fadeInUp">This feature will provide the latest koala sightings and rescue organizations in your vicinity based on your location and the distance you choose</p>
-                    <a href="MapsInformation.aspx" class="btn-get-started animated fadeInUp">Read More</a>
+                    <a href="Map.aspx" class="btn-get-started animated fadeInUp">Read More</a>
                 </div>
             </div>
 
@@ -143,19 +139,30 @@
         <div class=" mv" style="width: 100%;">
 
             <div class="row" style="width: 100%;" data-aos="fade-up" date-aos-delay="200">
-                <div class="col-lg-6 video-box">
+                <div class="col-lg-6 video-box" style="height: 100%;">
                     <img src="assets/img/img-home2.jpg" class="img-fluid" alt="">
                 </div>
-                <div class="col-lg-6 d-flex flex-column justify-content-center p-5" style="width: 100%;">
+                <div class="col-lg-6  justify-content-center " style="width: 100%;">
                     <div class="icon-box">
                         <h4 class="title">What we can do for them
                         </h4>
                         <p class="description">
+                            <p>Unless you have received training or have relevant experience, you can only choose to find relevant volunteer companies and find volunteer services you are interested in to help the koala. such as:</p>
+
+                            <p>Rescuing: Analyze whether the koala is in the environment by the forest fire, and rescue the koala in the potentially affected area.                                                                                     </p>
+
+                            <p>Caring for koalas: Comes into contact with koalas from a distance, including daily observation, feeding, etc.                                                                                                            </p>
+
+                            <p>Habitat maintenance: Mainly to carry out daily maintenance of the koala's habitat, or plant a tree for their home.                                                                                                       </p>
+
+                            <p>Education: Inspiring more compassionate people to participate in the protection of koala families by sharing relevant knowledge about koalas.                                                                            </p>
                             <p>
-                                Volunteer your time to support Koalas Volunteer your time to support Koalas
+                                Donation: Donation is also a fast way when you really want to make a contribution through your own efforts but can't spare your free time.
                             </p>
-                            <p>Help you find the nearest koala volunteer organizations</p>
-                            <p>Help you know the latest fire information</p>
+
+                            <p>For more information,  please click <a href="./Volunteering.aspx">here </a>
+                                <p />
+                            </p>
                         </p>
                     </div>
                 </div>
@@ -254,7 +261,7 @@
                         <ul>
                             <li><i class="bx bx-chevron-right"></i><a href="Information.aspx#koalainfo">Know About Koala</a></li>
                             <li><i class="bx bx-chevron-right"></i><a href="Information.aspx#bushfireinfo">Know About Bushfire</a></li>
-                            <li><i class="bx bx-chevron-right"></i><a href="Information.aspx#datadetail">Kow About Bushfire Affects on Koalas</a></li>
+                            <li><i class="bx bx-chevron-right"></i><a href="Information.aspx#datadetail">Know About Bushfire Effects On Koalas</a></li>
                         </ul>
                     </div>
 
@@ -262,7 +269,7 @@
                         <h4>Koala Eye</h4>
                         <ul>
                             <li><i class="bx bx-chevron-right"></i><a href="Map.aspx">View Koala Locations</a></li>
-                            <li><i class="bx bx-chevron-right"></i><a href="ChoroplethMap.aspx">View Choropleth Map</a></li>
+                            <li><i class="bx bx-chevron-right"></i><a href="Map.aspx">Likelihood Map</a></li>
                         </ul>
                     </div>
                 </div>

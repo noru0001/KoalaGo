@@ -38,7 +38,7 @@
 
 <body>
 
-    <!-- ======= Header ======= -->
+   <!-- ======= Header ======= -->
     <header id="header" class="fixed-top ">
         <div class="container">
 
@@ -50,14 +50,10 @@
 
             <nav class="nav-menu float-right d-none d-lg-block">
                 <ul>
-                    <li class="active"><a href="index.aspx">Home</a></li>
+                    <li><a href="index.aspx">Home</a></li>
                     <li><a href="Volunteering.aspx">Volunteering</a></li>
-                    <li class="drop-down"><a>Map</a>
-                        <ul>
-                            <li><a href="Map.aspx">Location Map</a></li>
-                            <li><a href="ChoroplethMap.aspx">Choropleth Map</a></li>
-                        </ul>
-                    </li>
+                    <li><a href="Map.aspx">Koala Eye</a></li>
+                     
                     <li><a href="Information.aspx">Information</a></li>
                 </ul>
             </nav>
@@ -236,7 +232,7 @@
                         <ul>
                             <li><i class="bx bx-chevron-right"></i><a href="Information.aspx#koalainfo">Know About Koala</a></li>
                             <li><i class="bx bx-chevron-right"></i><a href="Information.aspx#bushfireinfo">Know About Bushfire</a></li>
-                            <li><i class="bx bx-chevron-right"></i><a href="Information.aspx#datadetail">Kow About Bushfire Affects on Koalas</a></li>
+                            <li><i class="bx bx-chevron-right"></i><a href="Information.aspx#datadetail">Know About Bushfire Effects On Koalas</a></li>
                         </ul>
                     </div>
 
@@ -244,7 +240,8 @@
                         <h4>Koala Eye</h4>
                         <ul>
                             <li><i class="bx bx-chevron-right"></i><a href="Map.aspx">View Koala Locations</a></li>
-                            <li><i class="bx bx-chevron-right"></i><a href="ChoroplethMap.aspx">View Choropleth Map</a></li>
+                            <li><i class="bx bx-chevron-right"></i><a href="Map.aspx">Likelihood Map</a></li>
+                             
                         </ul>
                     </div>
                 </div>
