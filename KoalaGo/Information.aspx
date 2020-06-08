@@ -32,6 +32,10 @@
 
 <body>
 
+    <p>
+        bio
+    </p>
+
     <!-- ======= Header ======= -->
     <header id="header" class="fixed-top ">
         <div class="container">
@@ -137,7 +141,7 @@
                             </h2>
                             <div class="entry-content">
                                 <p>
-                                    Due to the bushfires, plumes of “black carbon” have traveled more than 7000 miles from the fires. Black carbon is harmful to biological health, air quality, and contributes to climate change.
+                                    Due to the bushfires, plumes of “black carbon” have traveled more than 7000 miles from the fires. Black carbon is harmful to <span data-dobid="hdw" jsslot="">biodiversity</span>, air quality, and contributes to climate change.
                                 </p>
                             </div>
                         </article>
@@ -154,7 +158,7 @@
                             </h2>
                             <div class="entry-content">
                                 <p>
-                                    The bushfires already create their weather to a vicious cycle. The flow above shows how bush-fore create their climate. However, this is not the first bushfire in Australia, which has seen large and small fires in the past year. Fires killed more than 1,300 people in 1939. In 1967, a similar number died, 1,293. In 1983, More than 2,000 people died. In 2009, the highest number of deaths was 2,029, known as “Black Saturday”.
+                                    The bushfires already create their weather to a vicious cycle. The flow above shows how bush-fore create their climate. Fires killed more than 1,300 people in 1939. In 1967, a similar number died, 1,293. In 1983, More than 2,000 people died. In 2009, the highest number of deaths was 2,029, known as “Black Saturday”.
                                 </p>
                             </div>
                         </article>
@@ -227,7 +231,7 @@
                 <div class="row counters">
 
                     <div class="col-lg-6 col-6 text-center">
-                        <span data-toggle="counter-up">30</span>
+                        <span data-toggle="counter-up">30%</span>
                         <p>percent of koala dead during the bushfire</p>
                     </div>
 
